@@ -34,22 +34,37 @@ bl_info = {
     "author" : "Nutti",
     "version" : (0, 1),
     "blender" : (2, 7, 0),
-    "location" : "UV Mapping > Face object to Transform Orientation",
+    "location" : "Object > Face object to Transform Orientation",
     "description" : "Face object to transform orientation",
     "warning" : "",
     "wiki_url" : "",
     "tracker_url" : "",
-    "category" : "UV"
+    "category" : "Object"
 }
 
+def SetOrientationCallback(scene, context):
+
+    items = []
+
+    for key in bpy.data.screens['Default'].scene.orientations.keys():
+        items.append((key, key, ""))
+    
+    return items
+
+
 # face to
-class FaceToTransformOrientation(bpy.types.Operator):
+class FTTO(bpy.types.Operator):
     """ """
 
-    bl_idname = "uv.face_to_transform_orientation"
-    bl_label = "Face To"
+    bl_idname = "object.face_to_transform_orientation"
+    bl_label = "Face To Transform Orientation"
     bl_description = "Face to transform orientation"
     bl_options = {'REGISTER', 'UNDO'}
+    
+    orientation = EnumProperty(
+        name = "Transform Orientation",
+        description = "Transform orientation",
+        items = SetOrientationCallback)
 
     offset_euler_x = FloatProperty(
         name = "Rotate X",
@@ -71,14 +86,19 @@ class FaceToTransformOrientation(bpy.types.Operator):
         default = 0.0,
         min = -360.0,
         max = 360.0)
-
+        
     base_euler = None
+    prev_orientation = None
 
     def __init__(self):
+        self.face_to(self.orientation)
+        
+    def face_to(self, orientation):
         # get base orientation
-        mat = bpy.data.screens['Default'].scene.orientations['test'].matrix
+        scene = bpy.data.screens['Default'].scene
+        mat = scene.orientations[orientation].matrix
         base_quota = mat.to_quaternion()
-
+    
         # set orientation to object
         active_obj = bpy.context.active_object
         mode = active_obj.rotation_mode
@@ -92,8 +112,13 @@ class FaceToTransformOrientation(bpy.types.Operator):
         self.offset_euler_z = 0.0
         self.base_euler = base_quota.to_euler()
         
-    def execute(self, context):
+        self.prev_orientation = orientation
         
+    def execute(self, context):
+    
+        if self.prev_orientation != self.orientation:
+            self.face_to(self.orientation)
+
         # set orientation to object
         active_obj = bpy.context.active_object
         mode = active_obj.rotation_mode
@@ -108,17 +133,18 @@ class FaceToTransformOrientation(bpy.types.Operator):
 
 # registration
 def menu_func(self, context):
-    self.layout.operator(FaceToTransformOrientation.bl_idname)
+    self.layout.separator()
+    self.layout.operator(FTTO.bl_idname)
 
 
 def register():
     bpy.utils.register_module(__name__)
-    bpy.types.VIEW3D_MT_uv_map.append(menu_func)
+    bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
     bpy.utils.unregister_module(__name__)
-    bpy.types.VIEW3D_MT_uv_map.remove(menu_func)
+    bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 
 if __name__ == "__main__":
