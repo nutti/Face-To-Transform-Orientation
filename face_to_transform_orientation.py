@@ -32,7 +32,7 @@ __date__ = "XX March 2015"
 bl_info = {
     "name" : "Face to Transform Orientation",
     "author" : "Nutti",
-    "version" : (0, 1),
+    "version" : (0, 2),
     "blender" : (2, 7, 0),
     "location" : "Object > Face object to Transform Orientation",
     "description" : "Face object to transform orientation",
@@ -56,7 +56,7 @@ def SetOrientationCallback(scene, context):
 class FTTO(bpy.types.Operator):
     """ """
 
-    bl_idname = "object.face_to_transform_orientation"
+    bl_idname = "object_transform.face_to_transform_orientation"
     bl_label = "Face To Transform Orientation"
     bl_description = "Face to transform orientation"
     bl_options = {'REGISTER', 'UNDO'}
@@ -96,15 +96,19 @@ class FTTO(bpy.types.Operator):
     def face_to(self, orientation):
         # get base orientation
         scene = bpy.data.screens['Default'].scene
+        if len(scene.orientations) == 0:
+            self.report({'WARNING'}, "Make Transform Orientation at first.")
+            return 1
         mat = scene.orientations[orientation].matrix
         base_quota = mat.to_quaternion()
     
         # set orientation to object
-        active_obj = bpy.context.active_object
-        mode = active_obj.rotation_mode
-        active_obj.rotation_mode = 'QUATERNION'
-        active_obj.rotation_quaternion = base_quota.copy()
-        active_obj.rotation_mode = mode
+        active_objs = bpy.context.selected_objects
+        for o in active_objs:
+            mode = o.rotation_mode
+            o.rotation_mode = 'QUATERNION'
+            o.rotation_quaternion = base_quota.copy()
+            o.rotation_mode = mode
 
         # set initial value
         self.offset_euler_x = 0.0
@@ -117,19 +121,24 @@ class FTTO(bpy.types.Operator):
     def execute(self, context):
     
         if self.prev_orientation != self.orientation:
-            self.face_to(self.orientation)
+            ret = self.face_to(self.orientation)
+            if ret != 0:
+                return {'CANCELLED'}
 
         # set orientation to object
-        active_obj = bpy.context.active_object
-        mode = active_obj.rotation_mode
-        active_obj.rotation_mode = 'QUATERNION'
         new_euler = self.base_euler.copy()
         new_euler.x += radians(self.offset_euler_x);
         new_euler.y += radians(self.offset_euler_y);
         new_euler.z += radians(self.offset_euler_z);
-        active_obj.rotation_quaternion = new_euler.to_quaternion()
+        active_objs = bpy.context.selected_objects
+        for o in active_objs:
+            mode = o.rotation_mode
+            o.rotation_mode = 'QUATERNION'
+            o.rotation_quaternion = new_euler.to_quaternion()
+            o.rotation_mode = mode
 
         return {'FINISHED'}
+
 
 # registration
 def menu_func(self, context):
@@ -139,12 +148,12 @@ def menu_func(self, context):
 
 def register():
     bpy.utils.register_module(__name__)
-    bpy.types.VIEW3D_MT_object.append(menu_func)
+    bpy.types.VIEW3D_MT_transform_object.append(menu_func)
 
 
 def unregister():
     bpy.utils.unregister_module(__name__)
-    bpy.types.VIEW3D_MT_object.remove(menu_func)
+    bpy.types.VIEW3D_MT_transform_object.remove(menu_func)
 
 
 if __name__ == "__main__":
