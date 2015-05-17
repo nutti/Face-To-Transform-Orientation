@@ -33,7 +33,7 @@ This add-on's features are as follows.
 
 ## Related Links
 
-* [Blender Artist](http://blenderartists.org/forum/showthread.php?367639-Addon-Face-object-to-Transform-Orientation&p=2848510#post2848510)
+* [Blender Artist](http://blenderartists.org/forum/showthread.php?367639-Addon-Face-object-to-Transform-Orientation)
 * [D.B.O T44454](https://developer.blender.org/T44279)
 * [Google+](https://plus.google.com/100058529622539760372/posts/LscGEa2AWK7)
 
