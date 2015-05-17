@@ -26,8 +26,8 @@ from bpy.props import *
 
 __author__ = "Nutti <nutti.metro@gmail.com>"
 __status__ = "production"
-__version__ = "0.1"
-__date__ = "XX March 2015"
+__version__ = "0.2"
+__date__ = "17 May 2015"
 
 bl_info = {
     "name" : "Face to Transform Orientation",
