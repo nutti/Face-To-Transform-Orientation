@@ -40,8 +40,7 @@ This add-on's features are as follows.
 ## Change Log
 |Version|Release Date|Change Log|
 |---|---|---|
-|0.2|2015.5.17|**Change feature**<br>1. Move menu to 'Object' - 'Transform' - 'Face To Transform Orientation'<br>
-2. Apply transformation to selected objects instead of active object.﻿|
+|0.2|2015.5.17|**Change feature**<br>1. Move menu to 'Object' - 'Transform' - 'Face To Transform Orientation'<br>2. Apply transformation to selected objects instead of active object.|
 |0.1|2015.3.28|First release.|
 
 ## Bug report / Feature request
